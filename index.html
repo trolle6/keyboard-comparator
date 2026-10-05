@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SwitchFit: will this switch fit my keyboard?</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Switch<span>Fit</span></h1>
+    <p>Pick your hotswap keyboard and see which switches you can use, with the reason for each.</p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>1. Your keyboard</h2>
+      <div class="row">
+        <select id="board"></select>
+        <select id="socket"></select>
+      </div>
+      <p id="socket-desc" class="hint"></p>
+      <details>
+        <summary>Not sure what socket you have?</summary>
+        <ul>
+          <li>Pull a switch and look at the PCB. <b>Five holes per key</b> (two small extra ones on the sides) means <b>MX 5-pin</b>. <b>Three holes</b> means <b>MX 3-pin</b>.</li>
+          <li>Budget board shipped with <b>Outemu</b> switches? It probably has <b>Outemu sockets</b>.</li>
+          <li>Thin, flat keyboard? It's low profile: <b>Choc v1</b> has a rectangular stem with two prongs, <b>Choc v2</b> and <b>Gateron LP</b> have a cross (+) stem.</li>
+          <li>Switches with no metal pins at all are <b>optical</b>. Adjustable actuation point means <b>magnetic</b>.</li>
+        </ul>
+      </details>
+    </section>
+
+    <section class="panel">
+      <h2>2. Switches</h2>
+      <div class="row">
+        <input id="search" placeholder="Search switches or brands…">
+        <select id="type">
+          <option value="all">All types</option>
+          <option value="linear">Linear</option>
+          <option value="tactile">Tactile</option>
+          <option value="clicky">Clicky</option>
+        </select>
+        <select id="show">
+          <option value="all">Show all</option>
+          <option value="usable">Usable only</option>
+          <option value="yes">Works</option>
+          <option value="mod">Needs a small mod</option>
+          <option value="risky">Risky</option>
+          <option value="no">Won't fit</option>
+        </select>
+      </div>
+      <div id="summary"></div>
+      <div id="results" class="grid"></div>
+    </section>
+
+    <section class="panel">
+      <h2>3. Switch not listed?</h2>
+      <div class="row">
+        <select id="c-family"></select>
+        <select id="c-pins"><option value="3">3 pins (2 metal + center post)</option><option value="5">5 pins (+2 plastic side legs)</option></select>
+        <label class="check"><input type="checkbox" id="c-thin"> Outemu / thin pins</label>
+        <button id="c-run">Check</button>
+      </div>
+      <p id="custom-out" class="hint"></p>
+    </section>
+  </main>
+
+  <footer>Pin counts are for the common retail versions. Some switches come in both 3-pin and 5-pin variants, so check the listing for yours.</footer>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
