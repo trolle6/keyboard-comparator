@@ -86,6 +86,7 @@ function render() {
         ${sw.force ? `<span>${sw.force}g</span>` : ""}
       </div>
       <p>${r.reason}</p>
+      <button class="comment-btn ghost" data-name="${esc(sw.name)}">Comment</button>
       <div class="source">${sw.source === "tg"
         ? `<a href="${sw.url}" target="_blank" rel="noopener">Force curve by ThereminGoat ↗</a> · footprint guessed from name`
         : "Hand-entered, not yet verified"}</div>
@@ -101,6 +102,36 @@ function runCustom() {
   const r = check(state.socket, sw);
   $("custom-out").innerHTML = `<span class="badge ${r.status}">${LABEL[r.status]}</span> ${r.reason}`;
 }
+
+function loadComments(topic, scroll) {
+  $("comments-topic").textContent = topic;
+  const s = document.createElement("script");
+  Object.entries({
+    src: "https://giscus.app/client.js",
+    "data-repo": "trolle6/keyboard-comparator",
+    "data-repo-id": "R_kgDOU8kioA",
+    "data-category": "General",
+    "data-category-id": "DIC_kwDOU8kioM4DHFqu",
+    "data-mapping": "specific",
+    "data-term": topic === "General feedback" ? topic : `Switch: ${topic}`,
+    "data-reactions-enabled": "1",
+    "data-input-position": "top",
+    "data-theme": "transparent_dark",
+    "data-lang": "en",
+    "data-loading": "lazy",
+    crossorigin: "anonymous",
+  }).forEach(([k, v]) => s.setAttribute(k, v));
+  s.async = true;
+  $("comments").replaceChildren(s);
+  if (scroll) $("comments-panel").scrollIntoView({ behavior: "smooth" });
+}
+
+$("results").onclick = (e) => {
+  const btn = e.target.closest(".comment-btn");
+  if (btn) loadComments(btn.dataset.name, true);
+};
+$("comments-general").onclick = () => loadComments("General feedback", true);
+loadComments("General feedback");
 
 renderSocketOptions();
 $("c-family").innerHTML = Object.entries(FAMILY_LABEL).map(([k, v]) => `<option value="${k}">${v}</option>`).join("");

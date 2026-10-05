@@ -18,6 +18,9 @@ select, input, button {
 }
 #search { flex: 1; min-width: 200px; }
 button { background: var(--accent); color: #0b0d12; font-weight: 600; cursor: pointer; border: none; }
+button.ghost { background: transparent; color: var(--accent); border: 1px solid var(--line); padding: 6px 10px; font-size: .8rem; }
+button.ghost:hover { border-color: var(--accent); }
+.comment-btn { margin-top: 10px; }
 .check { display: flex; gap: 6px; align-items: center; color: var(--dim); }
 details { margin-top: 10px; color: var(--dim); }
 summary { cursor: pointer; color: var(--accent); }
