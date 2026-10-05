@@ -1,6 +1,9 @@
 // Returns { status: "yes" | "mod" | "risky" | "no", reason }
 function check(socketId, sw) {
   const s = SOCKETS[socketId];
+  if (LOOSE_MATCH[sw.family]?.includes(s.family)) {
+    return { status: "risky", reason: `Same general kind of switch as your board (${FAMILY_LABEL[s.family]}), but low-profile and optical footprints differ between brands. Check the exact model before buying.` };
+  }
   if (s.family !== sw.family) {
     return { status: "no", reason: `${FAMILY_LABEL[sw.family]} switch, but your board has ${s.name} sockets. Different footprint, so it won't fit.` };
   }
@@ -12,11 +15,24 @@ function check(socketId, sw) {
   if (s.pinGauge === "thin" && sw.gauge !== "thin") {
     return { status: "risky", reason: "Outemu sockets are made for thin pins. Thicker pins can stretch or crack the socket, and afterwards Outemu switches may stop making contact." };
   }
+  if (!sw.pins) {
+    return s.pcbPins === 5
+      ? { status: "yes", reason: "MX-style switch. Your board takes both 3-pin and 5-pin, so it fits either way." }
+      : { status: "mod", reason: "MX-style, pin count unknown. If it has two small plastic side legs (5-pin), clip them. If not, it just fits." };
+  }
   if (sw.pins === 5 && s.pcbPins === 3) {
     return { status: "mod", reason: "5-pin switch on a 3-pin PCB. Clip the two small plastic side legs with flush cutters (never the metal pins) and it'll fit." };
   }
   return { status: "yes", reason: sw.pins === 3 && s.pcbPins === 5 ? "3-pin switch on a 5-pin board works fine, it's just held by the plate." : "Plug and play." };
 }
+
+const known = new Set(SWITCHES.map((s) => s.name.toLowerCase()));
+const ALL = [
+  ...SWITCHES.map((s) => ({ ...s, source: "curated" })),
+  ...(typeof TG_SWITCHES === "undefined" ? [] : TG_SWITCHES.filter((s) => !known.has(s.name.toLowerCase()))),
+];
+const MAX_CARDS = 120;
+const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 const LABEL = { yes: "Works", mod: "Needs a small mod", risky: "Risky", no: "Won't fit" };
 const ORDER = { yes: 0, mod: 1, risky: 2, no: 3 };
@@ -46,30 +62,37 @@ function render() {
     return;
   }
   const q = state.q.toLowerCase();
-  const rows = SWITCHES.map((sw) => ({ sw, r: check(state.socket, sw) }))
+  const rows = ALL.map((sw) => ({ sw, r: check(state.socket, sw) }))
     .filter(({ sw, r }) =>
       (state.type === "all" || sw.type === state.type) &&
       (state.show === "all" || (state.show === "usable" ? r.status !== "no" : r.status === state.show)) &&
       (`${sw.name} ${sw.brand}`.toLowerCase().includes(q)))
     .sort((a, b) => ORDER[a.r.status] - ORDER[b.r.status] || a.sw.name.localeCompare(b.sw.name));
 
-  const counts = SWITCHES.reduce((c, sw) => (c[check(state.socket, sw).status]++, c), { yes: 0, mod: 0, risky: 0, no: 0 });
-  $("summary").innerHTML = Object.keys(LABEL).map((k) => `<span class="pill ${k}">${counts[k]} ${LABEL[k]}</span>`).join("");
+  const counts = ALL.reduce((c, sw) => (c[check(state.socket, sw).status]++, c), { yes: 0, mod: 0, risky: 0, no: 0 });
+  $("summary").innerHTML = `<span class="pill total">${ALL.length} switches</span>` +
+    Object.keys(LABEL).map((k) => `<span class="pill ${k}">${counts[k]} ${LABEL[k]}</span>`).join("");
 
-  list.innerHTML = rows.length ? rows.map(({ sw, r }) => `
+  const cards = rows.slice(0, MAX_CARDS).map(({ sw, r }) => `
     <article class="card ${r.status}">
       <div class="card-head">
-        <h3>${sw.name}</h3>
+        <h3>${esc(sw.name)}</h3>
         <span class="badge ${r.status}">${LABEL[r.status]}</span>
       </div>
       <div class="meta">
-        <span class="tag ${sw.type}">${sw.type}</span>
+        ${sw.type !== "unknown" ? `<span class="tag ${sw.type}">${sw.type}</span>` : ""}
         <span>${FAMILY_LABEL[sw.family]}</span>
         ${sw.pins ? `<span>${sw.pins}-pin</span>` : ""}
-        <span>${sw.force}g</span>
+        ${sw.force ? `<span>${sw.force}g</span>` : ""}
       </div>
       <p>${r.reason}</p>
-    </article>`).join("") : `<p class="empty">No switches match those filters.</p>`;
+      <div class="source">${sw.source === "tg"
+        ? `<a href="${sw.url}" target="_blank" rel="noopener">Force curve by ThereminGoat ↗</a> · footprint guessed from name`
+        : "Hand-entered, not yet verified"}</div>
+    </article>`).join("");
+  const more = rows.length > MAX_CARDS
+    ? `<p class="empty">Showing ${MAX_CARDS} of ${rows.length}. Search to narrow it down.</p>` : "";
+  list.innerHTML = rows.length ? cards + more : `<p class="empty">No switches match those filters.</p>`;
 }
 
 function runCustom() {

@@ -78,4 +78,9 @@ const KEYBOARDS = [
 const FAMILY_LABEL = {
   mx: "MX-style", choc1: "Kailh Choc v1", choc2: "Kailh Choc v2", glp2: "Gateron LP 2.0",
   "opt-gateron": "Gateron optical", he: "Magnetic",
+  lp: "Low profile (exact type unknown)", optical: "Optical (exact type unknown)",
+  other: "Non-MX (Alps, Topre/EC, inductive…)",
 };
+
+// Close cousins: same general kind of switch, but the exact footprint can't be told from the name.
+const LOOSE_MATCH = { lp: ["choc1", "choc2", "glp2"], optical: ["opt-gateron"] };

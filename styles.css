@@ -34,5 +34,9 @@ summary { cursor: pointer; color: var(--accent); }
 .meta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; font-size: .8rem; color: var(--dim); }
 .tag { text-transform: capitalize; font-weight: 600; }
 .tag.linear { color: #ff6b8b; } .tag.tactile { color: #c9a26b; } .tag.clicky { color: #5fb3ff; }
-.empty { color: var(--dim); }
+.empty { color: var(--dim); grid-column: 1 / -1; }
+.source { margin-top: 8px; font-size: .75rem; color: var(--dim); }
+.source a { color: var(--accent); text-decoration: none; }
+.pill.total { --c: var(--accent); }
+footer a { color: var(--accent); }
 footer { padding-bottom: 40px; font-size: .85rem; }
