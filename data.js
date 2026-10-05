@@ -66,7 +66,7 @@ const SWITCHES = [
 const KEYBOARDS = [
   { name: "Keychron Q series (Q1/Q2/Q3…)", socket: "mx-5" },
   { name: "Keychron V series (V1/V3…)", socket: "mx-5" },
-  { name: "Keychron K8 Max", socket: "mx-5" },
+  { name: "Keychron K8 Max (hot-swappable version)", socket: "mx-5" },
   { name: "Glorious GMMK Pro", socket: "mx-5" },
   { name: "Akko 5075B", socket: "mx-5" },
   { name: "Epomaker TH80", socket: "mx-5" },
